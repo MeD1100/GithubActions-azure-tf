@@ -104,6 +104,8 @@ jobs:
         ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
       run: |
         terraform import azurerm_resource_group.rg /subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ env.AKS_RESOURCE_GROUP }} || echo "Resource already managed by Terraform or doesn't exist"
+        terraform import azurerm_kubernetes_cluster.k8s /subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ env.AKS_RESOURCE_GROUP }}/providers/Microsoft.ContainerService/managedClusters/${{ env.AKS_NAME }} || echo "Resource already managed by Terraform or doesn't exist"
+        terraform import azurerm_container_registry.acr /subscriptions/${{ env.ARM_SUBSCRIPTION_ID }}/resourceGroups/${{ env.AKS_RESOURCE_GROUP }}/providers/Microsoft.ContainerRegistry/registries/${{ env.ACR_NAME }} || echo "Resource already managed by Terraform or doesn't exist"
 
   
     # Checks that all Terraform configuration files adhere to a canonical format
