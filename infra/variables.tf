@@ -11,7 +11,7 @@ variable "cluster_name" {
 }
 
 variable "kubernetes_version" {
-  default = "1.21.2"
+  default = "1.26.3"
 }
 
 variable "acr_name" {
