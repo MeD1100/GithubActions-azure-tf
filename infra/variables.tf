@@ -1,5 +1,5 @@
 variable "node_count" {
-  default = 3
+  default = 2
 }
 
 variable "dns_prefix" {
@@ -43,5 +43,5 @@ variable "resource_group_name" {
 }
 
 variable "location" {
-  default = "westeurope"
+  default = "northeurope"
 }
