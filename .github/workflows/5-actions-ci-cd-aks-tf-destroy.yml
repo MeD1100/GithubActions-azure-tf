@@ -1,23 +1,25 @@
-name: Terraform Destroy
+name: Destroy-AKS-Resources
 
 on:
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
 jobs:
-  destroy:
+  destroy-aks-resources:
     runs-on: ubuntu-latest
     env:
+      DOCKER_REPOSITORY: medrh11
+      IMAGE_NAME: web-app
       AKS_RESOURCE_GROUP: rg-aks-cluster-tf-023
+      AKS_NAME: aks-cluster
+      ACR_NAME: acrforakstf023
       TERRAFORM_VERSION: 1.4.6
       WORKING_DIRECTORY: infra
-
-    # Use the Bash shell regardless whether the GitHub Actions runner is ubuntu-latest, macos-latest, or windows-latest
+    
     defaults:
       run:
         shell: bash
         working-directory: ${{ env.WORKING_DIRECTORY }}
-
+        
     steps:
     - uses: actions/checkout@v2
 
@@ -26,7 +28,7 @@ jobs:
       uses: hashicorp/setup-terraform@v1
       with:
         terraform_version: ${{ env.TERRAFORM_VERSION }}
-
+        
     - name: Terraform Init
       id: init
       env:
