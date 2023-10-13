@@ -175,7 +175,6 @@ jobs:
   
   destroy-resources:
     if: github.event.inputs.action == 'destroy'
-    needs: build-deploy-aks # Ensure this job runs after your main job
     runs-on: ubuntu-latest
     env:
       AKS_RESOURCE_GROUP: rg-aks-cluster-tf-023
