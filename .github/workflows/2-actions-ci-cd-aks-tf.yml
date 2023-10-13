@@ -8,10 +8,16 @@ on:
     branches:  none # [ main ]
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
+    inputs:
+      action:
+        description: 'Choose action: apply or destroy'
+        required: true
+        default: 'apply'
 
 jobs:
 
   build-deploy-aks:
+    if: github.event.inputs.action == 'apply'
     runs-on: ubuntu-latest
     env:
       DOCKER_REPOSITORY: medrh11
@@ -166,3 +172,46 @@ jobs:
         sleep 30s
         kubectl logs job.batch/kube-bench
         kubectl delete job.batch/kube-bench
+  
+  destroy-resources:
+    if: github.event.inputs.action == 'destroy'
+    needs: build-deploy-aks # Ensure this job runs after your main job
+    runs-on: ubuntu-latest
+    env:
+      AKS_RESOURCE_GROUP: rg-aks-cluster-tf-023
+      AKS_NAME: aks-cluster
+      ACR_NAME: acrforakstf023
+      TERRAFORM_VERSION: 1.4.6
+      WORKING_DIRECTORY: infra
+    
+    defaults:
+      run:
+        shell: bash
+        working-directory: ${{ env.WORKING_DIRECTORY }}
+        
+    steps:
+    - uses: actions/checkout@v2
+
+    # Install the latest version of Terraform CLI
+    - name: Install Terraform
+      uses: hashicorp/setup-terraform@v1
+      with:
+        terraform_version: ${{ env.TERRAFORM_VERSION }}
+        
+    - name: Terraform Init
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      run:
+        terraform init
+
+    - name: Terraform Destroy
+      env:
+        ARM_CLIENT_ID: ${{ secrets.ARM_CLIENT_ID }}
+        ARM_CLIENT_SECRET: ${{ secrets.ARM_CLIENT_SECRET }}
+        ARM_TENANT_ID: ${{ secrets.ARM_TENANT_ID }}
+        ARM_SUBSCRIPTION_ID: ${{ secrets.ARM_SUBSCRIPTION_ID }}
+      run: terraform destroy -auto-approve
+
